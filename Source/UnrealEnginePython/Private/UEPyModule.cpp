@@ -2845,7 +2845,7 @@ bool ue_py_convert_pyobject(PyObject* py_obj, FProperty* prop, uint8* buffer, in
 			Py_DECREF(py_long);
 			return true;
 		}
-		if (auto casted_prop = CastField<FInt64Property>(prop))
+		if (auto casted_prop = CastField<FUInt64Property>(prop))
 		{
 			PyObject* py_long = PyNumber_Long(py_obj);
 			casted_prop->SetPropertyValue_InContainer(buffer, PyLong_AsUnsignedLongLong(py_long), index);

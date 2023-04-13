@@ -65,7 +65,6 @@ static PyObject *py_ue_uscriptstruct_set_field(ue_PyUScriptStruct *self, PyObjec
 	if (!f_property)
 		return PyErr_Format(PyExc_Exception, "unable to find property %s", name);
 
-
 	if (!ue_py_convert_pyobject(value, f_property, self->u_struct_ptr, index))
 	{
 		return PyErr_Format(PyExc_Exception, "unable to set property %s", name);
