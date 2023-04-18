@@ -214,6 +214,61 @@ PyObject *py_ue_fproperty_has_metadata(ue_PyFProperty * self, PyObject * args)
 	Py_INCREF(Py_False);
 	return Py_False;
 }
+
+PyObject* py_ue_fproperty_get_name(ue_PyFProperty* self, PyObject* args) {
+	if (self->ue_fproperty == nullptr)
+		return PyErr_Format(PyExc_Exception, "PyFProperty is in invalid state");
+
+
+	FProperty* f_property = (FProperty*)self->ue_fproperty;
+	return PyUnicode_FromString(TCHAR_TO_UTF8(*(f_property->GetName())));
+}
+
+PyObject* py_ue_fproperty_get_full_name(ue_PyFProperty* self, PyObject* args) {
+	if (self->ue_fproperty == nullptr)
+		return PyErr_Format(PyExc_Exception, "PyFProperty is in invalid state");
+
+
+	FProperty* f_property = (FProperty*)self->ue_fproperty;
+	return PyUnicode_FromString(TCHAR_TO_UTF8(*(f_property->GetFullName())));
+}
+
+PyObject* py_ue_fproperty_get_class(ue_PyFProperty* self, PyObject* args) {
+	if (self->ue_fproperty == nullptr)
+		return PyErr_Format(PyExc_Exception, "PyFProperty is in invalid state");
+
+
+	FProperty* f_property = (FProperty*)self->ue_fproperty;
+	Py_RETURN_FFIELDCLASS(f_property->GetClass());
+}
+
+PyObject* py_ue_fproperty_convert(ue_PyFProperty* self, PyObject* args) {
+	if (self->ue_fproperty == nullptr)
+		return PyErr_Format(PyExc_Exception, "PyFProperty is in invalid state");
+
+
+	FProperty* f_property = (FProperty*)self->ue_fproperty;
+	return ue_py_convert_property(f_property, (uint8*)f_property, 0);
+}
+
+PyObject* py_ue_ffield_class_get_name(ue_PyFFieldClass* self, PyObject* args) {
+	if(self->ue_ffieldclass == nullptr)
+		return PyErr_Format(PyExc_Exception, "PyFFieldClass is in invalid state");
+
+	auto f_field_class = self->ue_ffieldclass;
+	return PyUnicode_FromString(TCHAR_TO_UTF8(*(f_field_class->GetName())));
+}
+
+PyObject* py_ue_ffield_class_get_default_object(ue_PyFFieldClass* self, PyObject* args) {
+	if (self->ue_ffieldclass == nullptr)
+		return PyErr_Format(PyExc_Exception, "PyFFieldClass is in invalid state");
+
+	auto f_field_class = self->ue_ffieldclass;
+	auto f_field_class_default = (FProperty*)f_field_class->GetDefaultObject();
+	Py_RETURN_FPROPERTY(f_field_class_default);
+	//return ue_py_convert_property(f_field_class_default, (uint8*)f_field_class_default, 0);
+}
+
 #endif
 
 #endif

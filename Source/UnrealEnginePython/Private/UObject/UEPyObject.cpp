@@ -1290,6 +1290,42 @@ PyObject *py_ue_get_property(ue_PyUObject *self, PyObject * args)
 #endif
 }
 
+PyObject *py_ue_get_property_array_inner(ue_PyUObject* self, PyObject* args)
+{
+
+	ue_py_check(self);
+
+	char* property_name;
+	if (!PyArg_ParseTuple(args, "s:get_property_array_inner", &property_name))
+	{
+		return NULL;
+	}
+
+	UStruct* u_struct = nullptr;
+
+	if (self->ue_object->IsA<UClass>())
+	{
+		u_struct = (UStruct*)self->ue_object;
+	}
+	else
+	{
+		u_struct = (UStruct*)self->ue_object->GetClass();
+	}
+
+	FProperty* f_property = u_struct->FindPropertyByName(FName(UTF8_TO_TCHAR(property_name)));
+	if (!f_property)
+		return PyErr_Format(PyExc_Exception, "unable to find property %s", property_name);
+
+	FArrayProperty* f_array_property = CastField<FArrayProperty>(f_property);
+	if (!f_array_property) {
+		return PyErr_Format(PyExc_Exception, "Property %s is not array", property_name);
+	}
+	
+	return PyUnicode_FromString(TCHAR_TO_UTF8(*(f_array_property->Inner->GetClass()->GetName())));
+
+	//Py_RETURN_FPROPERTY(f_array_property->Inner);
+}
+
 PyObject *py_ue_get_property_array_dim(ue_PyUObject *self, PyObject * args)
 {
 

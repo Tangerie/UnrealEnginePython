@@ -104,6 +104,7 @@ typedef struct
 	PyObject_HEAD
 	/* Type-specific fields go here. */
 	FProperty *ue_fproperty;
+	PyObject* py_proxy;
 	// the __dict__
 	PyObject *py_dict;
 	//// if true RemoveFromRoot will be called at object destruction time

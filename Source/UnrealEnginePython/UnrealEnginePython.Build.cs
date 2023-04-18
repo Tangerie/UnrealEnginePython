@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 public class UnrealEnginePython : ModuleRules
 {
-
     // leave this string as empty for triggering auto-discovery of python installations...
     private string pythonHome = "C:/Users/joshc/AppData/Local/Programs/Python/Python36";
     // otherwise specify the path of your python installation
@@ -105,8 +104,7 @@ public class UnrealEnginePython : ModuleRules
     public UnrealEnginePython(TargetInfo Target)
 #endif
     {
-
-        PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicDefinitions.Add("WITH_UNREALENGINEPYTHON=1"); // fixed
         string PluginDirectory = Path.Combine(ModuleDirectory, "..", "..");
 

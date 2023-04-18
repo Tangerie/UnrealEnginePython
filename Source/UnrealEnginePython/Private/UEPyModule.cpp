@@ -1734,6 +1734,13 @@ static PyMethodDef ue_PyFProperty_methods[] = {
 	{ "get_metadata", (PyCFunction)py_ue_fproperty_get_metadata, METH_VARARGS, "" },
 	{ "set_metadata", (PyCFunction)py_ue_fproperty_set_metadata, METH_VARARGS, "" },
 	{ "has_metadata", (PyCFunction)py_ue_fproperty_has_metadata, METH_VARARGS, "" },
+	{ "get_inner", (PyCFunction)py_ue_get_inner, METH_VARARGS, "" },
+	{ "get_key_prop", (PyCFunction)py_ue_get_key_prop, METH_VARARGS, "" },
+	{ "get_value_prop", (PyCFunction)py_ue_get_value_prop, METH_VARARGS, "" },
+	{ "get_name", (PyCFunction)py_ue_fproperty_get_name, METH_VARARGS, "" },
+	{ "get_full_name", (PyCFunction)py_ue_fproperty_get_full_name, METH_VARARGS, "" },
+	{ "get_class", (PyCFunction)py_ue_fproperty_get_class, METH_VARARGS, "" },
+	{ "convert", (PyCFunction)py_ue_fproperty_convert, METH_VARARGS, "" },
 #endif
         { NULL }  /* Sentinel */
 };
@@ -1844,6 +1851,10 @@ static int ue_PyFFieldClass_setattro(ue_PyFFieldClass* self, PyObject* attr_name
 
 
 static PyMethodDef ue_PyFFieldClass_methods[] = {
+#if WITH_EDITOR
+	{ "get_name", (PyCFunction)py_ue_ffield_class_get_name, METH_VARARGS, "" },
+	{ "get_default_object", (PyCFunction)py_ue_ffield_class_get_default_object, METH_VARARGS, "" },
+#endif
         { NULL }  /* Sentinel */
 };
 
@@ -2347,13 +2358,14 @@ ue_PyFProperty* ue_get_python_fproperty(FProperty* ue_fprop)
 		}
 		// so we must initialize the type struct variables
 		ue_py_property->ue_fproperty = ue_fprop;
-		//ue_py_property->py_proxy = nullptr;
+		ue_py_property->py_proxy = nullptr;
 		ue_py_property->py_dict = PyDict_New();
 		//ue_py_property->auto_rooted = 0;
 		//ue_py_property->owned = 0;
 #if defined(UEPY_MEMORY_DEBUG)
 		UE_LOG(LogPython, Warning, TEXT("CREATED UPyFProperty at %p for %p %s"), ue_py_property, ue_fprop, *ue_fprop->GetName());
 #endif
+
 		return ue_py_property;
 		}
 	return ret;
