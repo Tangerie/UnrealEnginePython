@@ -338,31 +338,31 @@ std::string ue_py_fproperty_util_get_type_as_str(FProperty* prop) {
 		{
 			if (casted_struct == TBaseStructure<FVector>::Get())
 			{
-				return "Vector";
+				return "FVector";
 			}
 			if(casted_struct == TBaseStructure<FVector2D>::Get())
 			{
-				return "Vector2D";
+				return "FVector2D";
 			}
 			if(casted_struct == TBaseStructure<FRotator>::Get())
 			{
-				return "Rotator";
+				return "FRotator";
 			}
 			if(casted_struct == TBaseStructure<FTransform>::Get())
 			{
-				return "Transform";
+				return "FTransform";
 			}
 			if(casted_struct == FHitResult::StaticStruct())
 			{
-				return "HitResult";
+				return "FHitResult";
 			}
 			if(casted_struct == TBaseStructure<FColor>::Get())
 			{
-				return "Color";
+				return "FColor";
 			}
 			if(casted_struct == TBaseStructure<FLinearColor>::Get())
 			{
-				return "LinearColor";
+				return "FLinearColor";
 			} 
 			return "UScriptStruct";
 		}

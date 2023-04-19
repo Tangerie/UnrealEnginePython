@@ -27,6 +27,22 @@ static PyObject *py_ue_uscriptstruct_get_field(ue_PyUScriptStruct *self, PyObjec
 #endif
 }
 
+static PyObject* py_ue_uscriptstruct_get_fproperty(ue_PyUScriptStruct* self, PyObject* args)
+{
+	char* name;
+	int index = 0;
+	if (!PyArg_ParseTuple(args, "s|i:get_field", &name, &index))
+	{
+		return nullptr;
+	}
+
+	FProperty* f_property = self->u_struct->FindPropertyByName(FName(UTF8_TO_TCHAR(name)));
+	if (!f_property)
+		return PyErr_Format(PyExc_Exception, "unable to find property %s", name);
+
+	Py_RETURN_FPROPERTY(f_property);
+}
+
 static PyObject *py_ue_uscriptstruct_get_field_array_dim(ue_PyUScriptStruct *self, PyObject * args)
 {
 	char *name;
@@ -164,7 +180,6 @@ static PyObject *py_ue_uscriptstruct_ref(ue_PyUScriptStruct *, PyObject *);
 
 
 
-
 static PyMethodDef ue_PyUScriptStruct_methods[] = {
 	{ "get_field", (PyCFunction)py_ue_uscriptstruct_get_field, METH_VARARGS, "" },
 	{ "set_field", (PyCFunction)py_ue_uscriptstruct_set_field, METH_VARARGS, "" },
@@ -174,6 +189,7 @@ static PyMethodDef ue_PyUScriptStruct_methods[] = {
 	{ "clone", (PyCFunction)py_ue_uscriptstruct_clone, METH_VARARGS, "" },
 	{ "as_dict", (PyCFunction)py_ue_uscriptstruct_as_dict, METH_VARARGS, "" },
 	{ "ref", (PyCFunction)py_ue_uscriptstruct_ref, METH_VARARGS, "" },
+	{ "get_fproperty", (PyCFunction)py_ue_uscriptstruct_get_fproperty, METH_VARARGS, "" },
 	{ NULL }  /* Sentinel */
 };
 
