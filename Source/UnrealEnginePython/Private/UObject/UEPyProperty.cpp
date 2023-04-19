@@ -20,6 +20,7 @@
 #include "Runtime/Core/Public/Misc/OutputDeviceNull.h"
 #include "Runtime/CoreUObject/Public/Serialization/ObjectWriter.h"
 #include "Runtime/CoreUObject/Public/Serialization/ObjectReader.h"
+#include <string>
 
 
 
@@ -251,6 +252,189 @@ PyObject* py_ue_fproperty_convert(ue_PyFProperty* self, PyObject* args) {
 	return ue_py_convert_property(f_property, (uint8*)f_property, 0);
 }
 
+
+std::string ue_py_fproperty_util_get_type_as_str(FProperty* prop) {
+	uint8* buffer = (uint8*)prop;
+	int32 index = 0;
+
+	std::string strType = "Uknown";
+
+	if (auto casted_prop = CastField<FBoolProperty>(prop))
+	{
+		return "BoolProperty";
+	}
+
+	if(auto casted_prop = CastField<FIntProperty>(prop))
+	{
+		return "IntProperty";
+	}
+
+	if(auto casted_prop = CastField<FUInt32Property>(prop))
+	{
+		return "UInt32Property";
+	}
+
+	if(auto casted_prop = CastField<FInt64Property>(prop))
+	{
+		return "Int64Property";
+	}
+
+	// this is likely a bug - it was a FInt64Property before
+	if(auto casted_prop = CastField<FUInt64Property>(prop))
+	{
+		return "UInt64Property";
+	}
+
+	if(auto casted_prop = CastField<FFloatProperty>(prop))
+	{
+		return "FloatProperty";
+	}
+
+	if(auto casted_prop = CastField<FDoubleProperty>(prop))
+	{
+		return "DoubleProperty";
+	}
+
+	if(auto casted_prop = CastField<FByteProperty>(prop))
+	{
+		return "ByteProperty";
+	}
+
+	if(auto casted_prop = CastField<FEnumProperty>(prop))
+	{
+		return "EnumProperty";
+	}
+
+	if(auto casted_prop = CastField<FStrProperty>(prop))
+	{
+		return "StrProperty";
+	}
+
+	if(auto casted_prop = CastField<FTextProperty>(prop))
+	{
+		return "TextProperty";
+	}
+
+	if(auto casted_prop = CastField<FNameProperty>(prop))
+	{
+		return "NameProperty";
+	}
+
+	if(auto casted_prop = CastField<FObjectPropertyBase>(prop))
+	{
+		return "ObjectProperty";
+	}
+
+	if(auto casted_prop = CastField<FClassProperty>(prop))
+	{
+		return "ClassProperty";
+	}
+
+	// try to manage known struct first
+	if(auto casted_prop = CastField<FStructProperty>(prop))
+	{
+		
+		if (auto casted_struct = Cast<UScriptStruct>(casted_prop->Struct))
+		{
+			if (casted_struct == TBaseStructure<FVector>::Get())
+			{
+				return "Vector";
+			}
+			if(casted_struct == TBaseStructure<FVector2D>::Get())
+			{
+				return "Vector2D";
+			}
+			if(casted_struct == TBaseStructure<FRotator>::Get())
+			{
+				return "Rotator";
+			}
+			if(casted_struct == TBaseStructure<FTransform>::Get())
+			{
+				return "Transform";
+			}
+			if(casted_struct == FHitResult::StaticStruct())
+			{
+				return "HitResult";
+			}
+			if(casted_struct == TBaseStructure<FColor>::Get())
+			{
+				return "Color";
+			}
+			if(casted_struct == TBaseStructure<FLinearColor>::Get())
+			{
+				return "LinearColor";
+			} 
+			return "UScriptStruct";
+		}
+
+		return "StructProperty";
+	}
+
+	if(auto casted_prop = CastField<FWeakObjectProperty>(prop))
+	{
+		return "WeakObjectProperty";
+	}
+
+	if(auto casted_prop = CastField<FMulticastDelegateProperty>(prop))
+	{
+		return "MulticastDelegateProperty";
+	}
+
+	if(auto casted_prop = CastField<FDelegateProperty>(prop))
+	{
+		return "DelegateProperty";
+	}
+
+	if(auto casted_prop = CastField<FArrayProperty>(prop))
+	{
+		strType = "ArrayProperty<";
+		FScriptArrayHelper_InContainer array_helper(casted_prop, buffer, index);
+		FProperty* array_prop = casted_prop->Inner;
+		strType.append(ue_py_fproperty_util_get_type_as_str(array_prop));
+		strType.append(">");
+
+		return strType;
+	}
+
+	if(auto casted_prop = CastField<FMapProperty>(prop))
+	{
+		strType = "MapProperty<";
+		FScriptMapHelper_InContainer map_helper(casted_prop, buffer, index);
+
+		strType.append(ue_py_fproperty_util_get_type_as_str(map_helper.KeyProp));
+		strType.append(",");
+		strType.append(ue_py_fproperty_util_get_type_as_str(map_helper.ValueProp));
+
+		strType.append(">");
+
+		return strType;
+	}
+
+	if(auto casted_prop = CastField<FSetProperty>(prop))
+	{
+		strType = "SetProperty<";
+		FScriptSetHelper_InContainer set_helper(casted_prop, buffer, index);
+
+		FProperty* set_prop = casted_prop->ElementProp;
+		strType.append(ue_py_fproperty_util_get_type_as_str(set_prop));
+		strType.append(">");
+		return strType;
+	}
+
+	return strType;
+}
+
+PyObject* ue_py_fproperty_get_type_as_str(ue_PyFProperty* self, PyObject* args) {
+	if (self->ue_fproperty == nullptr)
+		return PyErr_Format(PyExc_Exception, "PyFProperty is in invalid state");
+
+
+	FProperty* f_property = (FProperty*)self->ue_fproperty;
+	auto strType = ue_py_fproperty_util_get_type_as_str(f_property);
+	return PyUnicode_FromString(strType.c_str());
+	// return PyUnicode_FromString(strType.c_str());
+}
+
 PyObject* py_ue_ffield_class_get_name(ue_PyFFieldClass* self, PyObject* args) {
 	if(self->ue_ffieldclass == nullptr)
 		return PyErr_Format(PyExc_Exception, "PyFFieldClass is in invalid state");
@@ -266,8 +450,9 @@ PyObject* py_ue_ffield_class_get_default_object(ue_PyFFieldClass* self, PyObject
 	auto f_field_class = self->ue_ffieldclass;
 	auto f_field_class_default = (FProperty*)f_field_class->GetDefaultObject();
 	Py_RETURN_FPROPERTY(f_field_class_default);
-	//return ue_py_convert_property(f_field_class_default, (uint8*)f_field_class_default, 0);
 }
+
+
 
 #endif
 

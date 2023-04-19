@@ -16,6 +16,8 @@ PyObject* py_ue_fproperty_get_name(ue_PyFProperty* self, PyObject* args);
 PyObject* py_ue_fproperty_get_full_name(ue_PyFProperty* self, PyObject* args);
 PyObject* py_ue_fproperty_get_class(ue_PyFProperty* self, PyObject* args);
 PyObject* py_ue_fproperty_convert(ue_PyFProperty* self, PyObject* args);
+std::string ue_py_fproperty_util_get_type_as_str(FProperty* prop);
+PyObject* ue_py_fproperty_get_type_as_str(ue_PyFProperty* self, PyObject* args);
 
 PyObject* py_ue_ffield_class_get_name(ue_PyFFieldClass* self, PyObject* args);
 PyObject* py_ue_ffield_class_get_default_object(ue_PyFFieldClass* self, PyObject* args);

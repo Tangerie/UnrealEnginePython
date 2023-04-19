@@ -1741,6 +1741,7 @@ static PyMethodDef ue_PyFProperty_methods[] = {
 	{ "get_full_name", (PyCFunction)py_ue_fproperty_get_full_name, METH_VARARGS, "" },
 	{ "get_class", (PyCFunction)py_ue_fproperty_get_class, METH_VARARGS, "" },
 	{ "convert", (PyCFunction)py_ue_fproperty_convert, METH_VARARGS, "" },
+	{ "get_type_str", (PyCFunction)ue_py_fproperty_get_type_as_str, METH_VARARGS, "" },
 #endif
         { NULL }  /* Sentinel */
 };
@@ -2549,6 +2550,8 @@ AActor* ue_get_actor(ue_PyUObject* py_obj)
 	}
 	return nullptr;
 }
+
+
 
 #if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
 // convert a property to a python object
