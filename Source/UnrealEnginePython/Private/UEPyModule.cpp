@@ -1744,6 +1744,7 @@ static PyMethodDef ue_PyFProperty_methods[] = {
 	{ "get_type_str", (PyCFunction)ue_py_fproperty_get_type_as_str, METH_VARARGS, "" },
 	{ "set_length", (PyCFunction)py_ue_fproperty_set_length, METH_VARARGS, "" },
 	{ "get_at_index", (PyCFunction)py_ue_fproperty_get_at_index, METH_VARARGS, "" },
+	{ "add_key", (PyCFunction)py_ue_fproperty_add_key, METH_VARARGS, "" },
 #endif
         { NULL }  /* Sentinel */
 };

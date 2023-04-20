@@ -302,7 +302,6 @@ PyObject* py_ue_fproperty_set_length(ue_PyFProperty* self, PyObject* args) {
 
 	FScriptArrayHelper_InContainer helper(f_array_property, ptr, 0);
 
-	FProperty* inner_prop = f_array_property->Inner;
 	helper.EmptyAndAddValues(array_length);
 	Py_RETURN_TRUE;
 }
@@ -341,6 +340,44 @@ PyObject* py_ue_fproperty_get_at_index(ue_PyFProperty* self, PyObject* args) {
 	return item;
 }
 
+PyObject* py_ue_fproperty_add_key(ue_PyFProperty* self, PyObject* args) {
+	if (self->ue_fproperty == nullptr)
+		return PyErr_Format(PyExc_Exception, "PyFProperty is in invalid state");
+
+
+	FProperty* f_property = (FProperty*)self->ue_fproperty;
+	auto f_map_property = CastField<FMapProperty>(f_property);
+
+	if (!f_map_property) {
+		return PyErr_Format(PyExc_Exception, "FProperty is not FMapProperty");
+	}
+
+
+	PyObject* obj_parent;
+	PyObject* py_key;
+	if (!PyArg_ParseTuple(args, "OO:add_key", &obj_parent, &py_key))
+	{
+		return NULL;
+	}
+
+	uint8* parent_ptr = get_obj_ptr(obj_parent);
+
+	if (parent_ptr == nullptr) {
+		return PyErr_Format(PyExc_Exception, "Parent is not valid (%s)", Py_TYPE(obj_parent)->tp_name);
+	}
+
+	FScriptMapHelper_InContainer helper(f_map_property, parent_ptr, 0);
+
+	int32 hindex = helper.AddDefaultValue_Invalid_NeedsRehash();
+	uint8* ptr = helper.GetPairPtr(hindex);
+
+	if (!ue_py_convert_pyobject(py_key, f_map_property->KeyProp, ptr, 0)) {
+		Py_RETURN_FALSE;
+	}
+
+	helper.Rehash();
+	Py_RETURN_TRUE;
+}
 
 std::string ue_py_fproperty_util_get_type_as_str(FProperty* prop) {
 	uint8* buffer = (uint8*)prop;
