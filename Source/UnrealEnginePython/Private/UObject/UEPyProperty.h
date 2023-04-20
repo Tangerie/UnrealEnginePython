@@ -21,6 +21,7 @@ PyObject* ue_py_fproperty_get_type_as_str(ue_PyFProperty* self, PyObject* args);
 PyObject* py_ue_fproperty_set_length(ue_PyFProperty* self, PyObject* args);
 PyObject* py_ue_fproperty_get_at_index(ue_PyFProperty* self, PyObject* args);
 PyObject* py_ue_fproperty_add_key(ue_PyFProperty* self, PyObject* args);
+PyObject* py_ue_fproperty_add_key_value(ue_PyFProperty* self, PyObject* args);
 
 PyObject* py_ue_ffield_class_get_name(ue_PyFFieldClass* self, PyObject* args);
 PyObject* py_ue_ffield_class_get_default_object(ue_PyFFieldClass* self, PyObject* args);
