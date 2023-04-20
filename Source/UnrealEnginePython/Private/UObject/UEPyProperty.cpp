@@ -252,6 +252,95 @@ PyObject* py_ue_fproperty_convert(ue_PyFProperty* self, PyObject* args) {
 	return ue_py_convert_property(f_property, (uint8*)f_property, 0);
 }
 
+bool is_obj_uobject(PyObject* obj) {
+	auto typeName = Py_TYPE(obj)->tp_name;
+	return strcmp(typeName, "unreal_engine.UObject") == 0;
+}
+
+bool is_obj_struct(PyObject* obj) {
+	auto typeName = Py_TYPE(obj)->tp_name;
+	return strcmp(typeName, "unreal_engine.UScriptStruct") == 0;
+}
+
+uint8* get_obj_ptr(PyObject* obj) {
+	if (is_obj_uobject(obj)) {
+		auto p = (ue_PyUObject*)(obj);
+		return (uint8*)p->ue_object;
+	}
+	else if (is_obj_struct(obj)) {
+		auto p = (ue_PyUScriptStruct*)(obj);
+		return p->u_struct_ptr;
+	}
+	return nullptr;
+}
+
+PyObject* py_ue_fproperty_set_length(ue_PyFProperty* self, PyObject* args) {
+	if (self->ue_fproperty == nullptr)
+		return PyErr_Format(PyExc_Exception, "PyFProperty is in invalid state");
+
+
+	FProperty* f_property = (FProperty*)self->ue_fproperty;
+	auto f_array_property = CastField<FArrayProperty>(f_property);
+
+	if (!f_array_property) {
+		return PyErr_Format(PyExc_Exception, "FProperty is not FArrayProperty");
+	}
+
+
+	PyObject* obj_parent;
+	int array_length;
+	if (!PyArg_ParseTuple(args, "Oi:set_length", &obj_parent, &array_length))
+	{
+		return NULL;
+	}
+
+	uint8* ptr = get_obj_ptr(obj_parent);
+
+	if (ptr == nullptr) {
+		return PyErr_Format(PyExc_Exception, "Parent is not valid (%s)", Py_TYPE(obj_parent)->tp_name);
+	}
+
+	FScriptArrayHelper_InContainer helper(f_array_property, ptr, 0);
+
+	FProperty* inner_prop = f_array_property->Inner;
+	helper.EmptyAndAddValues(array_length);
+	Py_RETURN_TRUE;
+}
+
+PyObject* py_ue_fproperty_get_at_index(ue_PyFProperty* self, PyObject* args) {
+	if (self->ue_fproperty == nullptr)
+		return PyErr_Format(PyExc_Exception, "PyFProperty is in invalid state");
+
+
+	FProperty* f_property = (FProperty*)self->ue_fproperty;
+	auto f_array_property = CastField<FArrayProperty>(f_property);
+
+	if (!f_array_property) {
+		return PyErr_Format(PyExc_Exception, "FProperty is not FArrayProperty");
+	}
+
+	PyObject* obj_parent;
+	int index;
+	if (!PyArg_ParseTuple(args, "Oi:get_at_index", &obj_parent, &index))
+	{
+		return NULL;
+	}
+
+	uint8* obj_ptr = get_obj_ptr(obj_parent);
+
+	if (obj_ptr == nullptr) {
+		return PyErr_Format(PyExc_Exception, "Parent is not valid (%s)", Py_TYPE(obj_parent)->tp_name);
+	}
+
+	FScriptArrayHelper_InContainer helper(f_array_property, obj_ptr, 0);
+
+	auto inner_prop = f_array_property->Inner;
+
+	uint8* ptr = helper.GetRawPtr(index);
+	PyObject* item = ue_py_convert_property(inner_prop, ptr, 0);
+	return item;
+}
+
 
 std::string ue_py_fproperty_util_get_type_as_str(FProperty* prop) {
 	uint8* buffer = (uint8*)prop;

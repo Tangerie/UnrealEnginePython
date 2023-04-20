@@ -16,7 +16,6 @@ static PyObject *py_ue_uscriptstruct_get_field(ue_PyUScriptStruct *self, PyObjec
 	FProperty *f_property = self->u_struct->FindPropertyByName(FName(UTF8_TO_TCHAR(name)));
 	if (!f_property)
 		return PyErr_Format(PyExc_Exception, "unable to find property %s", name);
-
 	return ue_py_convert_property(f_property, self->u_struct_ptr, index);
 #else
 	UProperty *u_property = self->u_struct->FindPropertyByName(FName(UTF8_TO_TCHAR(name)));
@@ -31,7 +30,7 @@ static PyObject* py_ue_uscriptstruct_get_fproperty(ue_PyUScriptStruct* self, PyO
 {
 	char* name;
 	int index = 0;
-	if (!PyArg_ParseTuple(args, "s|i:get_field", &name, &index))
+	if (!PyArg_ParseTuple(args, "s|i:get_fproperty", &name, &index))
 	{
 		return nullptr;
 	}

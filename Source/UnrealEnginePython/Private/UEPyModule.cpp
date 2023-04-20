@@ -1742,6 +1742,8 @@ static PyMethodDef ue_PyFProperty_methods[] = {
 	{ "get_class", (PyCFunction)py_ue_fproperty_get_class, METH_VARARGS, "" },
 	{ "convert", (PyCFunction)py_ue_fproperty_convert, METH_VARARGS, "" },
 	{ "get_type_str", (PyCFunction)ue_py_fproperty_get_type_as_str, METH_VARARGS, "" },
+	{ "set_length", (PyCFunction)py_ue_fproperty_set_length, METH_VARARGS, "" },
+	{ "get_at_index", (PyCFunction)py_ue_fproperty_get_at_index, METH_VARARGS, "" },
 #endif
         { NULL }  /* Sentinel */
 };
