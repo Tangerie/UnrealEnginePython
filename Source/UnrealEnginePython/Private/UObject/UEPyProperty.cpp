@@ -450,7 +450,6 @@ std::string ue_py_fproperty_util_get_type_as_str(FProperty* prop) {
 		return "Int64Property";
 	}
 
-	// this is likely a bug - it was a FInt64Property before
 	if(auto casted_prop = CastField<FUInt64Property>(prop))
 	{
 		return "UInt64Property";
@@ -491,15 +490,21 @@ std::string ue_py_fproperty_util_get_type_as_str(FProperty* prop) {
 		return "NameProperty";
 	}
 
+	
+
 	if(auto casted_prop = CastField<FObjectPropertyBase>(prop))
 	{
+		if (auto casted_object_base = CastField<FObjectProperty>(casted_prop)) {
+			if (auto casted_object = CastField<FClassProperty>(casted_object_base)) 
+				return "ClassProperty";
+
+			return "ObjectProperty";
+		};
+
+		// Might change to support other things from https://docs.unrealengine.com/4.27/en-US/API/Runtime/CoreUObject/UObject/FObjectPropertyBase/
 		return "ObjectProperty";
 	}
-
-	if(auto casted_prop = CastField<FClassProperty>(prop))
-	{
-		return "ClassProperty";
-	}
+	
 
 	// try to manage known struct first
 	if(auto casted_prop = CastField<FStructProperty>(prop))
